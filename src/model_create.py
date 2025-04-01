@@ -3,6 +3,8 @@ from datetime import datetime, timezone, timedelta
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import re
 
+from logger import print_log
+
 def return_model_tokenizer():
     def current_time_str_utc9():
         utc9 = timezone(timedelta(hours=9))
