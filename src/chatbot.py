@@ -117,7 +117,7 @@ def parse_llm_output(text):
     start = re.search(r'<\|start_header_id\|>assistant<\|end_header_id\|>', text)
 
     if not start:
-        print("⛔ assistant 시작 태그가 없음!", 'error')
+        print_log("⛔ assistant 시작 태그가 없음!", 'error')
         return None
 
     # 2. 해당 지점부터 텍스트 잘라서 파싱
