@@ -27,6 +27,6 @@ def return_model_tokenizer():
     #model = model.to('cuda')
     try:
         model = torch.compile(model)
-    except:
+    except RuntimeError:
         print_log("torch.compile() 실패: PyTorch 2.0 이상이 아니거나 해당 모델이 호환되지 않을 수 있습니다.", 'error')
     return model, tokenizer
