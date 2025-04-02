@@ -7,6 +7,7 @@ import json
 
 from model_create import return_model_tokenizer
 from logger import print_log
+from api_processor import put_user_histories
 
 SYSTEM_PROMPT = [
     {"role": "system",
@@ -248,7 +249,7 @@ def chat_with_llm(datasets):
     
         decoded_outputs = tokenizer.batch_decode(outputs, skip_special_tokens=False)
     
-        for data_input, output_text in zip(batch, decoded_outputs):
+        for data_input, output_text in zip(batcsh, decoded_outputs):
             result = parse_llm_output(output_text)
             print_log(f'사용자의 응답: {data_input}')
             if result:
@@ -267,7 +268,11 @@ def chat_with_llm(datasets):
                     relative_time=rel_time
                 )
                 print_log(f'복약 시점 >>> {med_time_str}')
+                
+                put_user_histories(med_time_str, 0)
+                # TODO : 0 고쳐야함
+                
                 batched_results.append(result)
             else:
                 print_log(output_text)
-                print_log("파싱 실패!", 'error')
+                print_log("JSON 파싱 실패!", 'error')
