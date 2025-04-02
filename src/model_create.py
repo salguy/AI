@@ -21,7 +21,7 @@ def return_model_tokenizer():
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         torch_dtype=torch.bfloat16,
-        device_map={"default": 0},
+        device_map={"": 0},
         trust_remote_code=True
     )
     #model = model.to('cuda')
