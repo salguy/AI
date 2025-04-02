@@ -159,20 +159,19 @@ def get_medication_time_str(
 ) -> str or None:
     """
     약 복용 날짜 및 시간을 기준으로 yy.mm.dd.hh.mm 형식 문자열을 반환
+    - med_day_offset: 오늘 기준 몇 일 전/후 (예: -1은 어제)
+    - absolute_time: 'HH:MM' 형식 (ex: '09:30')
+    - relative_time: '-HH:MM' 형식 (ex: '-02:00', 현재 시간 기준 몇 시간 전)
     """
 
-    # 기준 시간 설정 (기본: 한국 시간 기준 현재)
     utc9 = timezone(timedelta(hours=9))
     now = current_time or datetime.now(utc9)
 
-    # 날짜 기준
-    if med_day_offset is not None:
-        base_date = now + timedelta(days=med_day_offset)
-        base_date = base_date.replace(hour=0, minute=0, second=0, microsecond=0)
-    else:
-        base_date = now
+    # 기본 날짜 설정
+    base_date = now + timedelta(days=med_day_offset or 0)
+    base_date = base_date.replace(hour=0, minute=0, second=0, microsecond=0)
 
-    # 절대 시간 처리
+    # 절대 시간 기준
     if absolute_time:
         try:
             hour, minute = map(int, absolute_time.split(":"))
@@ -181,18 +180,17 @@ def get_medication_time_str(
             print(f"⚠️ Failed to parse absolute_time: {absolute_time} ({e})")
             return None
 
-    # 상대 시간 처리
+    # 상대 시간 기준
     elif relative_time:
         try:
             hour, minute = map(int, relative_time.strip('-').split(":"))
             delta = timedelta(hours=hour, minutes=minute)
-            med_time = now - delta
+            med_time = base_date - delta
         except Exception as e:
             print(f"⚠️ Failed to parse relative_time: {relative_time} ({e})")
             return None
 
     else:
-        # 시간 정보가 없음
         return None
 
     return med_time.strftime('%y.%m.%d.%H.%M')
