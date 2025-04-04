@@ -24,7 +24,7 @@ SYSTEM_PROMPT = [
                 - "이 약이 그리 좋다냐?": "false"
                 - "영감, 약 드슈!": "false"
             
-        - "약 복용일": 사용자가 복용 시점을 언급했으면 언제 먹었는지에 대한 일 수를 정수로 기록하세요. 언급이 없거나 명확히 파악할 수 없으면 null으로 기록하세요.
+        - "약 복용일": 사용자가 복용일과 관련된 내용을 언급했으면 언제 먹었는지에 대해 며칠 전인지 정수로 기록하세요. 언급이 없거나 명확히 파악할 수 없으면 null으로 기록하세요.
             - 사용자가 언급한 날짜 표현은 다음과 같은 예시대로 처리합니다.
                 - "오늘": 0
                 - "어제": -1
@@ -77,6 +77,12 @@ SYSTEM_PROMPT = [
         사용자가 일상적인 대화를 한 경우 json의 모든 key에 대한 모든 value의 값들을 null으로 설정한 후 "<json></json><response> 적절한 답변 </response>" 양식을 이용하여 사용자와의 자연스러운 대화를 진행하세요. 이때는 추가적인 정보를 요청하지 않아도 됩니다.
 
         ### 정확한 예시:
+        사용자: "나 약 2시에 먹었수."
+        챗봇 : <json>{"약 복용 여부": true, "약 복용일": 0, "약 복용 시간(절대)": "14:00", "약 복용 시간(상대)": null, "건강 상태": null, "추가 질문 여부": true, "추가 질문 정보": "건강 상태"}</json><response>약을 잘 챙겨 드셨군요! 혹시 어디 아프신 곳은 있으실까요?</response>
+
+        사용자: "나 약 1시간 전에 먹었어."
+        챗봇 : <json>{"약 복용 여부": true, "약 복용일": 0, "약 복용 시간(절대)": null, "건강 상태": "-1:00", "건강 상태": null, "추가 질문 여부": true, "추가 질문 정보": ""}</json><response>약을 잘 챙겨 드셨군요! 혹시 어디 아프신 곳은 있으실까요?</response>
+        
         사용자: "나 오늘 약 먹었수. 머리가 조금 아프네요."
         챗봇 : <json>{"약 복용 여부": true, "약 복용일": 0, "약 복용 시간(절대)": null, "약 복용 시간(상대)": null, "건강 상태": "두통", "추가 질문 여부": false, "추가 질문 정보": ""}</json><response>약을 이미 드셨군요. 머리가 아프시다니 걱정이네요. 통증이 심하면 병원을 방문해보시는 것도 좋을 것 같아요.</response>
         
@@ -151,6 +157,8 @@ def parse_medication_info(json_dict):
         print_log(f"❌ parse_medication_info 실패: {e}", 'error')
         return None, None, None
         
+from datetime import datetime, timedelta, timezone
+
 def get_medication_time_str(
     med_day_offset: int = None,
     absolute_time: str = None,
@@ -161,41 +169,38 @@ def get_medication_time_str(
     약 복용 날짜 및 시간을 기준으로 yy.mm.dd.hh.mm 형식 문자열을 반환
     """
 
-    # 기준 시간 설정 (기본: 한국 시간 기준 현재)
     utc9 = timezone(timedelta(hours=9))
     now = current_time or datetime.now(utc9)
 
-    # 날짜 기준
-    if med_day_offset is not None:
-        base_date = now + timedelta(days=med_day_offset)
-        base_date = base_date.replace(hour=0, minute=0, second=0, microsecond=0)
-    else:
-        base_date = now
+    med_time = None
 
-    # 절대 시간 처리
     if absolute_time:
         try:
+            base_date = now + timedelta(days=med_day_offset or 0)
             hour, minute = map(int, absolute_time.split(":"))
             med_time = base_date.replace(hour=hour, minute=minute)
         except Exception as e:
             print(f"⚠️ Failed to parse absolute_time: {absolute_time} ({e})")
             return None
 
-    # 상대 시간 처리
     elif relative_time:
         try:
             hour, minute = map(int, relative_time.strip('-').split(":"))
             delta = timedelta(hours=hour, minutes=minute)
-            med_time = now - delta
+            med_time = now - delta  # ✅ 상대 시간은 현재 시간 기준
         except Exception as e:
             print(f"⚠️ Failed to parse relative_time: {relative_time} ({e})")
             return None
 
+    elif med_day_offset is not None:
+        # 날짜만 있는 경우 → 자정 기준
+        med_time = (now + timedelta(days=med_day_offset)).replace(hour=0, minute=0, second=0, microsecond=0)
+
     else:
-        # 시간 정보가 없음
         return None
 
     return med_time.strftime('%y.%m.%d.%H.%M')
+
 
 def safe_json_load(json_input):
     if isinstance(json_input, dict):
@@ -207,18 +212,18 @@ def safe_json_load(json_input):
         print(f"❌ JSON 파싱 실패: {e}")
         return None
 
-MAX_NEW_TOKENS = 2048
-BATCH_SIZE = 8
-
-batched_results = []
-model, tokenizer = return_model_tokenizer()
-try:
-    eot_id_token = tokenizer.convert_tokens_to_ids("<|eot_id|>")
-    eos_token_id = [tokenizer.eos_token_id, eot_id_token]
-except:
-    eos_token_id = [tokenizer.eos_token_id]
-
 def chat_with_llm(datasets):
+    model, tokenizer = return_model_tokenizer()
+    MAX_NEW_TOKENS = 4096
+    BATCH_SIZE = 8
+    
+    batched_results = []
+    
+    try:
+        eot_id_token = tokenizer.convert_tokens_to_ids("<|eot_id|>")
+        eos_token_id = [tokenizer.eos_token_id, eot_id_token]
+    except:
+        eos_token_id = [tokenizer.eos_token_id]
     for i in tqdm(range(0, len(datasets), BATCH_SIZE)):
         batch = datasets[i:i + BATCH_SIZE]
         final_messages_list = [SYSTEM_PROMPT + [data] for data in batch]
@@ -249,8 +254,9 @@ def chat_with_llm(datasets):
     
         decoded_outputs = tokenizer.batch_decode(outputs, skip_special_tokens=False)
     
-        for data_input, output_text in zip(batcsh, decoded_outputs):
+        for data_input, output_text in zip(batch, decoded_outputs):
             result = parse_llm_output(output_text)
+            print(result)
             print_log(f'사용자의 응답: {data_input}')
             if result:
                 print_log(f'JSON: {result["json"]}')
@@ -276,3 +282,5 @@ def chat_with_llm(datasets):
             else:
                 print_log(output_text)
                 print_log("JSON 파싱 실패!", 'error')
+    
+    return batched_results[0]
