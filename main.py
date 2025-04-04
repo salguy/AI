@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from domain.ai import router as airouter
+import uvicorn
+
 tags_metadata = [
     {
         "name": "inference",
