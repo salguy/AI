@@ -16,6 +16,6 @@ jobs:
         username: ${{ secrets.GCP_USER }}
         key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
         script: |
-          cd ~/salguy
+          cd ~/salguy/AI
           git pull origin main
-          sudo pm2 restart
+          pm2 restart salguy
