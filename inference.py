@@ -11,7 +11,7 @@ def model_inference(input_text: str):
         device_map="auto"
     )
     tokenizer = AutoTokenizer.from_pretrained("NCSOFT/Llama-VARCO-8B-Instruct")
-    TODAY_DATE = datetime.date.today()
+    # TODAY_DATE = datetime.date.today()
     messages = [
     {"role": "system",
      "content":
