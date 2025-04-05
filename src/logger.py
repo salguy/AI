@@ -12,3 +12,4 @@ def print_log(msg, type='info'):
         print(yellow + f'[{time_str}] [WARNING] {msg}')
     else:
         print(green + f'[{time_str}] [INFO] {msg}')
+    print(green, end = '')
