@@ -3,6 +3,12 @@ import json
 
 from logger import print_log
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # .env 파일 로드
+
+API_SERVER_URL = os.getenv("API_SERVER_URL") 
 def put_user_histories(taken_at, schedule_id):
     data = {
         'taken_at' : taken_at,
@@ -14,7 +20,7 @@ def put_user_histories(taken_at, schedule_id):
         'Content-Type': 'application/json'
     }
 
-    url = "http://3.34.179.85:8000/api/user/histories"
+    url = f"{API_SERVER_URL}api/user/histories"
 
     response = requests.put(url, headers=headers, data=json.dumps(data))
 
