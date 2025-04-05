@@ -81,8 +81,8 @@ SYSTEM_PROMPT = [
         챗봇 : <json>{"약 복용 여부": true, "약 복용일": 0, "약 복용 시간(절대)": "14:00", "약 복용 시간(상대)": null, "건강 상태": null, "추가 질문 여부": true, "추가 질문 정보": "건강 상태"}</json><response>약을 잘 챙겨 드셨군요! 혹시 어디 아프신 곳은 있으실까요?</response>
 
         사용자: "나 약 1시간 전에 먹었어."
-        챗봇 : <json>{"약 복용 여부": true, "약 복용일": 0, "약 복용 시간(절대)": null, "건강 상태": "-1:00", "건강 상태": null, "추가 질문 여부": true, "추가 질문 정보": ""}</json><response>약을 잘 챙겨 드셨군요! 혹시 어디 아프신 곳은 있으실까요?</response>
-        
+        챗봇 : <json>{"약 복용 여부": true, "약 복용일": 0, "약 복용 시간(절대)": null, "약 복용 시간(상대)": "-1:00", "건강 상태": null, "추가 질문 여부": true, "추가 질문 정보": ""}</json><response>약을 잘 챙겨 드셨군요! 혹시 어디 아프신 곳은 있으실까요?</response>
+
         사용자: "나 오늘 약 먹었수. 머리가 조금 아프네요."
         챗봇 : <json>{"약 복용 여부": true, "약 복용일": 0, "약 복용 시간(절대)": null, "약 복용 시간(상대)": null, "건강 상태": "두통", "추가 질문 여부": false, "추가 질문 정보": ""}</json><response>약을 이미 드셨군요. 머리가 아프시다니 걱정이네요. 통증이 심하면 병원을 방문해보시는 것도 좋을 것 같아요.</response>
         
@@ -212,18 +212,18 @@ def safe_json_load(json_input):
         print(f"❌ JSON 파싱 실패: {e}")
         return None
 
-MAX_NEW_TOKENS = 2048
-BATCH_SIZE = 8
-
-batched_results = []
-model, tokenizer = return_model_tokenizer()
-try:
-    eot_id_token = tokenizer.convert_tokens_to_ids("<|eot_id|>")
-    eos_token_id = [tokenizer.eos_token_id, eot_id_token]
-except:
-    eos_token_id = [tokenizer.eos_token_id]
-
 def chat_with_llm(datasets):
+    model, tokenizer = return_model_tokenizer()
+    MAX_NEW_TOKENS = 4096
+    BATCH_SIZE = 8
+    
+    batched_results = []
+    
+    try:
+        eot_id_token = tokenizer.convert_tokens_to_ids("<|eot_id|>")
+        eos_token_id = [tokenizer.eos_token_id, eot_id_token]
+    except:
+        eos_token_id = [tokenizer.eos_token_id]
     for i in tqdm(range(0, len(datasets), BATCH_SIZE)):
         batch = datasets[i:i + BATCH_SIZE]
         final_messages_list = [SYSTEM_PROMPT + [data] for data in batch]
@@ -256,6 +256,7 @@ def chat_with_llm(datasets):
     
         for data_input, output_text in zip(batch, decoded_outputs):
             result = parse_llm_output(output_text)
+            print(result)
             print_log(f'사용자의 응답: {data_input}')
             if result:
                 print_log(f'JSON: {result["json"]}')
@@ -281,3 +282,5 @@ def chat_with_llm(datasets):
             else:
                 print_log(output_text)
                 print_log("JSON 파싱 실패!", 'error')
+    
+    return batched_results[0]
