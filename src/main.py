@@ -1,14 +1,19 @@
 import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from colorama import init
 
 from data_converter import return_to_dict
 from chatbot import chat_with_llm
 from logger import print_log
+from endpoint_runner import endpoint_run
 
 def environment_setting():
     requirements_file = os.path.join(os.path.dirname(__file__), '..', 'env', 'requirements.txt')
     os.system(f'pip install --quiet -r {requirements_file}')
-
+    endpoint_run()
+    
 def boot_system():
     init()
     version_info_file = os.path.join(os.path.dirname(__file__), '..', 'env', 'version_info.txt')
