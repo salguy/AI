@@ -1,6 +1,9 @@
 import os
 import sys
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+requirements_file = os.path.join(os.path.dirname(__file__), '..', 'env', 'requirements.txt')
+os.system(f'pip install --quiet -r {requirements_file}')
 
 from colorama import init
 
@@ -9,10 +12,6 @@ from chatbot import chat_with_llm
 from logger import print_log
 from endpoint_runner import endpoint_run
 
-def environment_setting():
-    requirements_file = os.path.join(os.path.dirname(__file__), '..', 'env', 'requirements.txt')
-    os.system(f'pip install --quiet -r {requirements_file}')
-    
 def boot_system():
     init()
     version_info_file = os.path.join(os.path.dirname(__file__), '..', 'env', 'version_info.txt')
@@ -31,6 +30,5 @@ def boot_system():
     endpoint_run()
 
 if __name__ == '__main__':
-    environment_setting()
     boot_system()
             
