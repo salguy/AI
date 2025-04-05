@@ -12,7 +12,6 @@ from endpoint_runner import endpoint_run
 def environment_setting():
     requirements_file = os.path.join(os.path.dirname(__file__), '..', 'env', 'requirements.txt')
     os.system(f'pip install --quiet -r {requirements_file}')
-    endpoint_run()
     
 def boot_system():
     init()
@@ -29,15 +28,9 @@ def boot_system():
         AI_version = 'unknown'
     print_log(f'PROGRAM VERSION \t\t | {program_version}')
     print_log(f'AI VERSION \t\t | {AI_version}')
+    endpoint_run()
 
 if __name__ == '__main__':
     environment_setting()
     boot_system()
-    while True:
-        text = input('메세지를 입력하세요, -1을 입력하면 종료시킵니다. | ')
-        if(text.strip()=='-1'):
-            break
-        else:
-            final_text = [return_to_dict(text)]
-            chat_with_llm(final_text)
             
