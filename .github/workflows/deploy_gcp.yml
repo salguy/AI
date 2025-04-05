@@ -17,5 +17,5 @@ jobs:
         key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
         script: |
           cd ~/salguy/AI
-          git pull origin main
+          git pull origin develop
           pm2 restart salguy
