@@ -16,7 +16,7 @@ async def ai_inference(record: AIInput, request: Request):
     """
     try:
         raw = await request.body()
-        print("🧾 [AI 서버] Raw body:", raw.decode("utf-8"))
+        print_log("🧾 [AI 서버] Raw body:", raw.decode("utf-8"))
         print_log("response : ", record)
         print_log("input_text : ", record.input_text)
         print_log("scheduleId : ", record.scheduleId)
