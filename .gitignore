@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+*.txt
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# PyTorch / Transformers cache
+*.pt
+*.bin
+*.ckpt
+*.onnx
+*.safetensors
+*.h5
+*.tflite
+*.pb
+results/
+output/
+cache/
+datasets/
+runs/
+
+# Hugging Face model & tokenizer cache
+~/.cache/huggingface
+huggingface/
+*.gguf
+
+# VSCode / PyCharm
+.vscode/
+.idea/
+
+# Logs
+*.log
+logs/
+nohup.out
+
+# System files
+.DS_Store
+Thumbs.db
+
+# pm2 logs & dump
+dump.pm2
+*.pid
+
+# Docker
+*.db
+docker-compose.override.yml

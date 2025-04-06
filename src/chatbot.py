@@ -212,7 +212,7 @@ def safe_json_load(json_input):
         print(f"❌ JSON 파싱 실패: {e}")
         return None
 
-def chat_with_llm(datasets):
+def chat_with_llm(datasets, scheduleId):
     model, tokenizer = return_model_tokenizer()
     MAX_NEW_TOKENS = 4096
     BATCH_SIZE = 8
@@ -275,7 +275,7 @@ def chat_with_llm(datasets):
                 )
                 print_log(f'복약 시점 >>> {med_time_str}')
                 
-                put_user_histories(med_time_str, 0)
+                put_user_histories(med_time_str, scheduleId)
                 # TODO : 0 고쳐야함
                 
                 batched_results.append(result)
