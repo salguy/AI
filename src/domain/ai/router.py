@@ -1,5 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from domain.ai.crud import *
+from logger import print_log
+
+
 
 router = APIRouter()
 
@@ -11,8 +14,8 @@ async def ai_inference(record: AIInput):
     **scheduleId**   : int
     """
     try:
-        print("input_text : ", record.input_text)
-        print("scheduleId : ", record.scheduleId)
+        print_log("input_text : ", record.input_text)
+        print_log("scheduleId : ", record.scheduleId)
         return deliver_to_model(record.input_text, record.scheduleId)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
