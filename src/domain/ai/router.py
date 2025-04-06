@@ -11,6 +11,8 @@ async def ai_inference(record: AIInput):
     **scheduleId**   : int
     """
     try:
+        print("input_text : ", record.input_text)
+        print("scheduleId : ", record.scheduleId)
         return deliver_to_model(record.input_text, record.scheduleId)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
