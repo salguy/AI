@@ -6,7 +6,8 @@ from logger import print_log
 from dotenv import load_dotenv
 import os
 
-load_dotenv()  # .env 파일 로드
+dotenv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../env/.env"))
+load_dotenv(dotenv_path)
 
 API_SERVER_URL = os.getenv("API_SERVER_URL") 
 def put_user_histories(taken_at, schedule_id):
