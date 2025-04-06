@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from domain.ai.crud import *
 from logger import print_log
-
+from domain.ai.schema import *
 
 
 router = APIRouter()
