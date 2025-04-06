@@ -14,6 +14,7 @@ async def ai_inference(record: AIInput):
     **scheduleId**   : int
     """
     try:
+        print_log("response : ", record)
         print_log("input_text : ", record.input_text)
         print_log("scheduleId : ", record.scheduleId)
         return deliver_to_model(record.input_text, record.scheduleId)
