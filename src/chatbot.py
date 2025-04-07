@@ -118,8 +118,9 @@ SYSTEM_PROMPT = [
 
 def parse_llm_output(text):
     # 1. assistant 시작 위치 찾기
-    print("text: ", text)
-    print("text type: ", type(text))
+    print("🧪 [디버깅] 들어온 text 타입:", type(text))  # 얘가 먼저 찍힘
+    print("🧪 [디버깅] 들어온 text 길이:", len(text))
+    print("🧪 [디버깅] text 내용 일부:", repr(text[:300]))  # 줄바꿈 포함 보이게
     start = re.search(r'<\|start_header_id\|>assistant<\|end_header_id\|>', text)
 
     if not start:
