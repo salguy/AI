@@ -277,11 +277,11 @@ def chat_with_llm(datasets, scheduleId):
                 )
                 print_log(f'복약 시점 >>> {med_time_str}')
                 
-                put_user_histories(med_time_str, scheduleId)
+            #put_user_histories(med_time_str, scheduleId)
                 
                 batched_results.append(result)
             else:
                 print_log(output_text)
                 print_log("JSON 파싱 실패!", 'error')
     
-    return batched_results[0]
+    return batched_results[0], med_time_str

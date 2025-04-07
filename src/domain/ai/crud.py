@@ -9,7 +9,7 @@ def deliver_to_model(text, scheduleId):
     final_text = [return_to_dict(text)]
     print_log(f"🧠 변환된 텍스트: {final_text}")
 
-    output = chat_with_llm(final_text, scheduleId)
+    output, med_time = chat_with_llm(final_text, scheduleId)
     print_log(f"🗣️ 모델 응답: {output}")
 
-    return {"model_output": output}
+    return {"model_output": output, "med_time": med_time}
