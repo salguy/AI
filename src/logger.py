@@ -7,9 +7,9 @@ def print_log(msg, type='info'):
     yellow = colorama.Fore.YELLOW
     green = colorama.Fore.GREEN
     if(type == 'error'):
-        print(red + f'[{time_str}] [ERROR] {msg}')
+        print(red + f'[{time_str}] [ERROR] {msg}', flush=True)
     elif(type == 'warning'):
-        print(yellow + f'[{time_str}] [WARNING] {msg}')
+        print(yellow + f'[{time_str}] [WARNING] {msg}', flush=True)
     else:
-        print(green + f'[{time_str}] [INFO] {msg}')
-    print(green, end = '')
+        print(green + f'[{time_str}] [INFO] {msg}', flush=True)
+    print(green, end = '', flush=True)

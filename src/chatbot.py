@@ -258,8 +258,6 @@ def chat_with_llm(datasets, scheduleId):
         decoded_outputs = tokenizer.batch_decode(outputs, skip_special_tokens=False)
         
         for data_input, output_text in zip(batch, decoded_outputs):
-            print("output: ", output_text)
-
             result = parse_llm_output(output_text)
             print_log(f'사용자의 응답: {data_input}')
             if result:
