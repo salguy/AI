@@ -16,11 +16,11 @@ async def ai_inference(record: AIInput, request: Request):
     """
     try:
         raw = await request.body()
-        print_log("🧾 [AI 서버] request :", request)
-        print_log("🧾 [AI 서버] Raw body:", raw.decode("utf-8"))
-        print_log("response : ", record)
-        print_log("input_text : ", record.input_text)
-        print_log("scheduleId : ", record.scheduleId)
+        print_log(f"🧾 [AI 서버] request :{request}")
+        print_log(f"🧾 [AI 서버] Raw body: {raw.decode("utf-8")}")
+        print_log(f"response : {record}")
+        print_log(f"input_text : {record.input_text}")
+        print_log(f"scheduleId : {record.scheduleId}")
         return deliver_to_model(record.input_text, record.scheduleId)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
