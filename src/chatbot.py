@@ -253,7 +253,7 @@ def chat_with_llm(datasets, scheduleId):
         )
     
         decoded_outputs = tokenizer.batch_decode(outputs, skip_special_tokens=False)
-    
+        print(decoded_outputs)
         for data_input, output_text in zip(batch, decoded_outputs):
             result = parse_llm_output(output_text)
             print(result)
@@ -276,7 +276,6 @@ def chat_with_llm(datasets, scheduleId):
                 print_log(f'복약 시점 >>> {med_time_str}')
                 
                 put_user_histories(med_time_str, scheduleId)
-                # TODO : 0 고쳐야함
                 
                 batched_results.append(result)
             else:
