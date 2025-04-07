@@ -118,6 +118,8 @@ SYSTEM_PROMPT = [
 
 def parse_llm_output(text):
     # 1. assistant 시작 위치 찾기
+    print(text)
+    print(type(text))
     start = re.search(r'<\|start_header_id\|>assistant<\|end_header_id\|>', text)
 
     if not start:
@@ -254,6 +256,7 @@ def chat_with_llm(datasets, scheduleId):
     
         decoded_outputs = tokenizer.batch_decode(outputs, skip_special_tokens=False)
         print(decoded_outputs)
+        
         for data_input, output_text in zip(batch, decoded_outputs):
             result = parse_llm_output(output_text)
             print(result)
