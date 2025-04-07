@@ -118,9 +118,9 @@ SYSTEM_PROMPT = [
 
 def parse_llm_output(text):
     # 1. assistant 시작 위치 찾기
-    print("🧪 [디버깅] 들어온 text 타입:", type(text))  # 얘가 먼저 찍힘
+    print("🧪 [디버깅] 들어온 text 타입:", type(text), flush=True)  # 얘가 먼저 찍힘
     print("🧪 [디버깅] 들어온 text 길이:", len(text))
-    print("🧪 [디버깅] text 내용 일부:", repr(text[:300]))  # 줄바꿈 포함 보이게
+    print("🧪 [디버깅] text 내용 일부:", repr(text[:300]), flush=True)  # 줄바꿈 포함 보이게
     start = re.search(r'<\|start_header_id\|>assistant<\|end_header_id\|>', text)
 
     if not start:
@@ -258,8 +258,9 @@ def chat_with_llm(datasets, scheduleId):
         decoded_outputs = tokenizer.batch_decode(outputs, skip_special_tokens=False)
         
         for data_input, output_text in zip(batch, decoded_outputs):
+            print("output: ", output_text)
+
             result = parse_llm_output(output_text)
-            print(result)
             print_log(f'사용자의 응답: {data_input}')
             if result:
                 print_log(f'JSON: {result["json"]}')
