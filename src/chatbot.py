@@ -288,5 +288,6 @@ def chat_with_llm(datasets, scheduleId):
             else:
                 print_log(output_text)
                 print_log("JSON 파싱 실패!", 'error')
+                raise ValueError("JSON 파싱 실패!")
     
     return batched_results[0], med_time_str
