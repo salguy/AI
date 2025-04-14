@@ -220,7 +220,20 @@ def safe_json_load(json_input):
         print(f"❌ JSON 파싱 실패: {e}")
         return None
 
-def chat_with_llm(datasets, scheduleId):
+def chat_with_llm(datasets, custom_prompt=None):
+    
+    """
+    LLM 모델과 대화를 진행합니다.
+
+    Args:
+        datasets (list): 대화 데이터셋
+        custom_prompt (str, optional): 커스텀 프롬프트. 기본값은 None.
+
+    Returns:
+        str: 모델의 응답
+    """
+    
+    
     model, tokenizer = return_model_tokenizer()
     MAX_NEW_TOKENS = 4096
     BATCH_SIZE = 8
@@ -232,9 +245,13 @@ def chat_with_llm(datasets, scheduleId):
         eos_token_id = [tokenizer.eos_token_id, eot_id_token]
     except:
         eos_token_id = [tokenizer.eos_token_id]
+    
     for i in tqdm(range(0, len(datasets), BATCH_SIZE)):
         batch = datasets[i:i + BATCH_SIZE]
-        final_messages_list = [SYSTEM_PROMPT + [data] for data in batch]
+        
+        # 커스텀 프롬프트가 있으면 사용, 없으면 기본 SYSTEM_PROMPT 사용
+        system_prompt = [{"role": "system", "content": custom_prompt}] if custom_prompt else SYSTEM_PROMPT
+        final_messages_list = [system_prompt + [data] for data in batch]
     
         prompt_texts = [
             tokenizer.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True)

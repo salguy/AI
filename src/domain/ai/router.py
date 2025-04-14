@@ -18,9 +18,78 @@ async def ai_inference(record: AIInput, request: Request):
         raw = await request.body()
         raw = raw.decode("utf-8")
         print_log(f"🧾 [AI 서버] Raw body: {raw}")
-        # print_log(f"response : {record}")
-        # print_log(f"input_text : {record.input_text}")
-        # print_log(f"scheduleId : {record.scheduleId}")
-        return deliver_to_model(record.input_text, record.scheduleId)
+        return deliver_to_model(record.input_text)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/api/inference/check_meal")
+async def check_meal_inference(data: AIInput):
+    """
+    복약 전 식사여부 체크를 위한 AI 추론
+    
+    Parameters:
+        - input_text: 사용자 음성을 텍스트로 변환한 내용
+        - scheduleId: 복약 스케줄 ID
+    
+    Returns:
+        - model_output: AI 모델의 출력
+            - response: AI의 응답 텍스트
+    """
+    try:
+        return await process_check_meal(data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/api/inference/induce_medicine")
+async def induce_medicine_inference(data: AIInput):
+    """
+    복약 유도를 위한 AI 추론
+    
+    Parameters:
+        - input_text: 사용자 음성을 텍스트로 변환한 내용
+        - scheduleId: 복약 스케줄 ID
+    
+    Returns:
+        - model_output: AI 모델의 출력
+            - response: AI의 응답 텍스트
+    """
+    try:
+        return await process_induce_medicine(data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/api/inference/taking_medicine_time")
+async def taking_medicine_time_inference():
+    """
+    복약 시점 도달을 위한 AI 추론
+    
+    Parameters:
+        - input_text: 사용자 음성을 텍스트로 변환한 내용
+        - scheduleId: 복약 스케줄 ID
+    
+    Returns:
+        - model_output: AI 모델의 출력
+            - response: AI의 응답 텍스트
+    """
+    try:
+        return await process_notify_medicine()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/api/inference/check_medicine")
+async def check_medicine_inference(data: AIInput):
+    """
+    복용 완료 확인을 위한 AI 추론
+    
+    Parameters:
+        - input_text: 사용자 음성을 텍스트로 변환한 내용
+        - scheduleId: 복약 스케줄 ID
+    
+    Returns:
+        - model_output: AI 모델의 출력
+            - response: AI의 응답 텍스트
+    """
+    try:
+        return await process_confirm_medicine(data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
