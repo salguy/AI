@@ -73,7 +73,7 @@ async def process_notify_medicine() -> str:
     print_log("💡 [AI모델] 약 복용 알림 요청")
     try:
         # 빈 대화 히스토리로 시작
-        datasets = 0
+        datasets = []
         response = chat_with_llm(datasets, custom_prompt=MEDICINE_NOTIFICATION_PROMPT)
         print_log(f"✅ [AI모델] 약 복용 알림 응답: {response}")
         return response

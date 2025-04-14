@@ -237,7 +237,7 @@ def chat_with_llm(datasets, custom_prompt=None):
     BATCH_SIZE = 8
     
     batched_results = []
-    if not datasets:
+    if datasets == []:
         datasets = [{"role": "user", "content": ""}]
             
     try:
