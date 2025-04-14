@@ -289,7 +289,7 @@ def chat_with_llm(datasets, custom_prompt=None):
 
                 json_data = safe_json_load(result["json"])
                 if json_data is None:
-                    print_log("JSON 파싱 실패!", 'error')
+                    print_log("JSON이 None이므로 파싱 실패!", 'error')
                     continue
                 
                 if json_data is not None:
