@@ -89,7 +89,7 @@ MEDICINE_NOTIFICATION_PROMPT = """
 
 사용자가 약 복용 시점에 도달했습니다.  
 따뜻하고 공감 있는 말투로, 지금 약을 복용해야 한다는 사실을 자연스럽게 전달해 주세요.
-단, <json></json><response></response> 형식으로 정리해 주세요. 태그는 반드시 출력해야 하고 태그 외 텍스트는 절대 출력하지 마세요.
+단, <json></json><response></response> 형식으로 정리해 주세요. 태그 외 텍스트는 절대 출력하지 마세요.
 
 모든 응답은 <response> 태그 안에 작성하세요.
 

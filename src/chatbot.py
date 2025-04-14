@@ -3,6 +3,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import re
 from tqdm import tqdm
 import json
+from prompts import *
 
 from model_create import return_model_tokenizer
 from logger import print_log
@@ -291,21 +292,31 @@ def chat_with_llm(datasets, custom_prompt=None):
 
                 json_data = safe_json_load(result["json"])
                 if json_data is None:
+                    if custom_prompt == MEDICINE_NOTIFICATION_PROMPT:
+                        batched_results.append(result)
+                        return batched_results[0], med_time_str
                     print_log("JSON 파싱 실패!", 'error')
                     continue
-
-                day_offset, abs_time, rel_time = parse_medication_info(json_data)
-                med_time_str = get_medication_time_str(
-                    med_day_offset=day_offset,
-                    absolute_time=abs_time,
-                    relative_time=rel_time
-                )
-                print_log(f'복약 시점 >>> {med_time_str}')
+                
+                if custom_prompt == MEDICINE_CONFIRMATION_PROMPT:
+                    day_offset, abs_time, rel_time = parse_medication_info(json_data)
+                    med_time_str = get_medication_time_str(
+                        med_day_offset=day_offset,
+                        absolute_time=abs_time,
+                        relative_time=rel_time
+                    )
+                    print_log(f'복약 시점 >>> {med_time_str}')
                 
                 batched_results.append(result)
             else:
+                if custom_prompt == MEDICINE_NOTIFICATION_PROMPT:
+                    batched_results.append(result)
+                    return batched_results[0], med_time_str
                 print_log(output_text)
                 print_log("JSON 파싱 실패!", 'error')
                 raise ValueError("JSON 파싱 실패!")
     
-    return batched_results[0], med_time_str
+    if custom_prompt == MEDICINE_CONFIRMATION_PROMPT:
+        return batched_results[0], med_time_str
+    else: 
+        return batched_results[0]
