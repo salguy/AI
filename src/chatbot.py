@@ -282,6 +282,7 @@ def chat_with_llm(datasets, custom_prompt=None):
         for data_input, output_text in zip(batch, decoded_outputs):
             result = parse_llm_output(output_text)
             print_log(f'사용자의 응답: {data_input}')
+            print_log(f'AI의 응답: {output_text}')
             if result:
                 print_log(f'JSON: {result["json"]}')
                 print_log(f'응답: {result["response"]}')
@@ -298,8 +299,6 @@ def chat_with_llm(datasets, custom_prompt=None):
                     relative_time=rel_time
                 )
                 print_log(f'복약 시점 >>> {med_time_str}')
-                
-            #put_user_histories(med_time_str, scheduleId)
                 
                 batched_results.append(result)
             else:
