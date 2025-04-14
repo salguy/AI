@@ -12,7 +12,6 @@ async def ai_inference(record: AIInput, request: Request):
     """
     AI의 추론을 반환하는 엔드포인트입니다.
     **input_text** : str
-    **scheduleId**   : int
     """
     try:
         raw = await request.body()
@@ -29,7 +28,6 @@ async def check_meal_inference(data: AIInput):
     
     Parameters:
         - input_text: 사용자 음성을 텍스트로 변환한 내용
-        - scheduleId: 복약 스케줄 ID
     
     Returns:
         - model_output: AI 모델의 출력
@@ -47,7 +45,6 @@ async def induce_medicine_inference(data: AIInput):
     
     Parameters:
         - input_text: 사용자 음성을 텍스트로 변환한 내용
-        - scheduleId: 복약 스케줄 ID
     
     Returns:
         - model_output: AI 모델의 출력
@@ -65,7 +62,6 @@ async def taking_medicine_time_inference():
     
     Parameters:
         - input_text: 사용자 음성을 텍스트로 변환한 내용
-        - scheduleId: 복약 스케줄 ID
     
     Returns:
         - model_output: AI 모델의 출력
@@ -83,7 +79,6 @@ async def check_medicine_inference(data: AIInput):
     
     Parameters:
         - input_text: 사용자 음성을 텍스트로 변환한 내용
-        - scheduleId: 복약 스케줄 ID
     
     Returns:
         - model_output: AI 모델의 출력
