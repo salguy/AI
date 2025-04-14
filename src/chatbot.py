@@ -311,7 +311,7 @@ def chat_with_llm(datasets, custom_prompt=None):
             else:
                 if custom_prompt == MEDICINE_NOTIFICATION_PROMPT:
                     batched_results.append(result)
-                    return batched_results[0], med_time_str
+                    return batched_results[0]
                 print_log(output_text)
                 print_log("JSON 파싱 실패!", 'error')
                 raise ValueError("JSON 파싱 실패!")
