@@ -3,7 +3,6 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import re
 from tqdm import tqdm
 import json
-from prompts import *
 
 from model_create import return_model_tokenizer
 from logger import print_log
@@ -122,7 +121,7 @@ SYSTEM_PROMPT = [
      }
 ]
 
-def parse_llm_output(text, is_confirmation=False):
+def parse_llm_output(text):
     # 1. assistant 시작 위치 찾기
     #print("🧪 [디버깅] 들어온 text 타입:", type(text), flush=True)  # 얘가 먼저 찍힘
     #print("🧪 [디버깅] 들어온 text 길이:", len(text))
@@ -136,34 +135,22 @@ def parse_llm_output(text, is_confirmation=False):
     # 2. 해당 지점부터 텍스트 잘라서 파싱
     relevant_text = text[start.end():].strip()
 
-    # 3. 태그별로 추출    
+    # 3. 태그별로 추출
+    json_match = re.search(r'<json>(.*?)</json>', relevant_text, re.DOTALL)
     response_match = re.search(r'<response>(.*?)</response>', relevant_text, re.DOTALL)
-    if is_confirmation:
-        json_match = re.search(r'<json>(.*?)</json>', relevant_text, re.DOTALL)
-        if json_match and response_match:
-            return {
-                "json": json_match.group(1).strip(),
-                "response": response_match.group(1).strip(),
-            }
-    
-        else:
-            print_log("❌ 일부 태그가 누락되었거나 형식이 다름!", 'error')
-            if not json_match:
-                print_log("⛔ <json> 태그 못 찾음", 'error')
-            if not response_match:
-                print_log("⛔ <response> 태그 못 찾음", 'error')
-            return None
-    else: 
-        if response_match:
-            return {
-                "response": response_match.group(1).strip(),
-            }
-    
-        else:
-            print_log("❌ 일부 태그가 누락되었거나 형식이 다름!", 'error')
-            if not response_match:
-                print_log("⛔ <response> 태그 못 찾음", 'error')
-            return None
+
+    if json_match and response_match:
+        return {
+            "json": json_match.group(1).strip(),
+            "response": response_match.group(1).strip(),
+        }
+    else:
+        print_log("❌ 일부 태그가 누락되었거나 형식이 다름!", 'error')
+        if not json_match:
+            print_log("⛔ <json> 태그 못 찾음", 'error')
+        if not response_match:
+            print_log("⛔ <response> 태그 못 찾음", 'error')
+        return None
         
 def parse_medication_info(json_dict):
     """
@@ -245,17 +232,14 @@ def chat_with_llm(datasets, custom_prompt=None):
     Returns:
         str: LLM의 응답
     """
-    
     model, tokenizer = return_model_tokenizer()
     MAX_NEW_TOKENS = 4096
     BATCH_SIZE = 8
-
-    batched_results = []
     
-    # 빈 데이터셋 처리
+    batched_results = []
     if not datasets:
         datasets = [{"role": "user", "content": ""}]
-    
+            
     try:
         eot_id_token = tokenizer.convert_tokens_to_ids("<|eot_id|>")
         eos_token_id = [tokenizer.eos_token_id, eot_id_token]
@@ -304,31 +288,23 @@ def chat_with_llm(datasets, custom_prompt=None):
 
                 json_data = safe_json_load(result["json"])
                 if json_data is None:
-                    if custom_prompt == MEDICINE_NOTIFICATION_PROMPT:
-                        batched_results.append(result)
-                        return batched_results[0], med_time_str
                     print_log("JSON 파싱 실패!", 'error')
                     continue
+
+                day_offset, abs_time, rel_time = parse_medication_info(json_data)
+                med_time_str = get_medication_time_str(
+                    med_day_offset=day_offset,
+                    absolute_time=abs_time,
+                    relative_time=rel_time
+                )
+                print_log(f'복약 시점 >>> {med_time_str}')
                 
-                if custom_prompt == MEDICINE_CONFIRMATION_PROMPT:
-                    day_offset, abs_time, rel_time = parse_medication_info(json_data)
-                    med_time_str = get_medication_time_str(
-                        med_day_offset=day_offset,
-                        absolute_time=abs_time,
-                        relative_time=rel_time
-                    )
-                    print_log(f'복약 시점 >>> {med_time_str}')
+            #put_user_histories(med_time_str, scheduleId)
                 
                 batched_results.append(result)
             else:
-                if custom_prompt == MEDICINE_NOTIFICATION_PROMPT:
-                    batched_results.append(result)
-                    return batched_results[0]
                 print_log(output_text)
                 print_log("JSON 파싱 실패!", 'error')
                 raise ValueError("JSON 파싱 실패!")
     
-    if custom_prompt == MEDICINE_CONFIRMATION_PROMPT:
-        return batched_results[0], med_time_str
-    else: 
-        return batched_results[0]
+    return batched_results[0], med_time_str
