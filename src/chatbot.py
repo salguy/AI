@@ -221,90 +221,40 @@ def safe_json_load(json_input):
         return None
 
 def chat_with_llm(datasets, custom_prompt=None):
-    
     """
-    LLM 모델과 대화를 진행합니다.
+    LLM과 대화를 나누는 함수입니다.
 
     Args:
-        datasets (list): 대화 데이터셋
-        custom_prompt (str, optional): 커스텀 프롬프트. 기본값은 None.
+        datasets (list): 대화 데이터셋 리스트
+        custom_prompt (str, optional): 커스텀 프롬프트. 기본값은 None입니다.
 
     Returns:
-        str: 모델의 응답
+        str: LLM의 응답
     """
-    
-    
-    model, tokenizer = return_model_tokenizer()
-    MAX_NEW_TOKENS = 4096
-    BATCH_SIZE = 8
-    
-    batched_results = []
-    
     try:
-        eot_id_token = tokenizer.convert_tokens_to_ids("<|eot_id|>")
-        eos_token_id = [tokenizer.eos_token_id, eot_id_token]
-    except:
-        eos_token_id = [tokenizer.eos_token_id]
-    
-    for i in tqdm(range(0, len(datasets), BATCH_SIZE)):
-        batch = datasets[i:i + BATCH_SIZE]
+        # 빈 데이터셋 처리
+        if not datasets:
+            datasets = [{"role": "user", "content": ""}]
+            
+        # 프롬프트 설정
+        prompt = custom_prompt if custom_prompt else SYSTEM_PROMPT
         
-        # 커스텀 프롬프트가 있으면 사용, 없으면 기본 SYSTEM_PROMPT 사용
-        system_prompt = [{"role": "system", "content": custom_prompt}] if custom_prompt else SYSTEM_PROMPT
-        final_messages_list = [system_prompt + [data] for data in batch]
-    
-        prompt_texts = [
-            tokenizer.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True)
-            for msgs in final_messages_list
+        # 대화 메시지 구성
+        messages = [
+            {"role": "system", "content": prompt},
+            *datasets
         ]
-    
-        tokenized = tokenizer(
-            prompt_texts,
-            return_tensors="pt",
-            padding=True,
-            truncation=True,
-            max_length=4096
-        )
-    
-        input_ids = tokenized["input_ids"].to("cuda")
-        attention_mask = tokenized["attention_mask"].to("cuda")
-    
-        outputs = model.generate(
-            input_ids=input_ids,
-            attention_mask=attention_mask,
-            max_new_tokens=MAX_NEW_TOKENS,
-            do_sample=False,
-            eos_token_id=eos_token_id
-        )
-    
-        decoded_outputs = tokenizer.batch_decode(outputs, skip_special_tokens=False)
         
-        for data_input, output_text in zip(batch, decoded_outputs):
-            result = parse_llm_output(output_text)
-            print_log(f'사용자의 응답: {data_input}')
-            if result:
-                print_log(f'JSON: {result["json"]}')
-                print_log(f'응답: {result["response"]}')
-
-                json_data = safe_json_load(result["json"])
-                if json_data is None:
-                    print_log("JSON 파싱 실패!", 'error')
-                    continue
-
-                day_offset, abs_time, rel_time = parse_medication_info(json_data)
-                med_time_str = get_medication_time_str(
-                    med_day_offset=day_offset,
-                    absolute_time=abs_time,
-                    relative_time=rel_time
-                )
-                print_log(f'복약 시점 >>> {med_time_str}')
-                
-            #put_user_histories(med_time_str, scheduleId)
-                
-                batched_results.append(result)
-            else:
-                print_log(output_text)
-                print_log("JSON 파싱 실패!", 'error')
-                raise ValueError("JSON 파싱 실패!")
-    
-    return batched_results[0], med_time_str
+        # LLM 호출
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=messages,
+            temperature=0.7,
+            max_tokens=1000
+        )
+        
+        return response.choices[0].message.content
+        
+    except Exception as e:
+        print(f"LLM 호출 중 오류 발생: {str(e)}")
+        raise
