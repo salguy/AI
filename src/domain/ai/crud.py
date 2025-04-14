@@ -132,7 +132,7 @@ async def deliver_to_model(input_text: str) -> dict:
         print_log(f"❌ 모델 응답 생성 중 오류: {str(e)}", "error")
         raise ValueError(f"모델 응답 생성 중 오류 발생: {str(e)}")
 
-async def process_daily_talk(text: str) -> dict:
+async def process_daily_talk(text: str) -> str:
     """
     일상 대화 처리를 위한 함수
     
