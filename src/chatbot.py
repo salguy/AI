@@ -310,5 +310,7 @@ def chat_with_llm(datasets, custom_prompt=None):
                 print_log(output_text)
                 print_log("JSON 파싱 실패!", 'error')
                 raise ValueError("JSON 파싱 실패!")
-    
-    return batched_results[0], med_time_str
+    if custom_prompt == MEDICINE_CONFIRMATION_PROMPT:
+        return batched_results[0], med_time_str
+    else:
+        return batched_results[0]
