@@ -88,3 +88,20 @@ async def check_medicine_inference(data: AIInput):
         return await process_confirm_medicine(data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/api/inference/daily_talk")
+async def daily_talk_inference(data: AIInput):
+    """
+    일상 대화를 위한 AI 추론
+    
+    Parameters:
+        - input_text: 사용자 음성을 텍스트로 변환한 내용
+    
+    Returns:
+        - model_output: AI 모델의 출력
+            - response: AI의 응답 텍스트
+    """
+    try:
+        return await process_daily_talk(data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

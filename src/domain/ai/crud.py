@@ -109,8 +109,8 @@ async def process_confirm_medicine(text: str) -> str:
 
 async def deliver_to_model(input_text: str) -> dict:
     """
-    AI 모델에 입력을 전달하고 응답을 반환합니다.
-
+    AI 모델에 입력을 전달하고 응답을 받는 함수
+    
     Args:
         input_text (str): 사용자 입력 텍스트
 
@@ -131,3 +131,28 @@ async def deliver_to_model(input_text: str) -> dict:
     except Exception as e:
         print_log(f"❌ 모델 응답 생성 중 오류: {str(e)}", "error")
         raise ValueError(f"모델 응답 생성 중 오류 발생: {str(e)}")
+
+async def process_daily_talk(text: str) -> dict:
+    """
+    일상 대화 처리를 위한 함수
+    
+    Args:
+        data (AIInput): 사용자 입력 데이터
+    
+    Returns:
+        dict: AI 모델의 응답
+    """
+    print_log(f"💡 [AI모델] 받은 텍스트: {text}")
+    try:
+        # 입력 텍스트를 딕셔너리로 변환
+        input_data = {"role": "user", "content": text}
+        datasets = [input_data]
+        
+        # 모델에 입력 전달
+        response = chat_with_llm(datasets, custom_prompt=DAILY_TALKING_PROMPT)
+        print_log(f"🗣️ 모델 응답: {response}")
+        
+        return {"model_output": response}
+    except Exception as e:
+        print_log(f"❌ 일상 대화 처리 중 오류 발생: {str(e)}", "error")
+        raise ValueError(f"일상 대화 처리 중 오류 발생: {str(e)}")
