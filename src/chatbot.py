@@ -311,6 +311,13 @@ def chat_with_llm(datasets, custom_prompt=None):
                 print_log("JSON 파싱 실패!", 'error')
                 raise ValueError("JSON 파싱 실패!")
     if custom_prompt == MEDICINE_CONFIRMATION_PROMPT:
-        return batched_results[0], med_time_str
+        return {
+                    "json": batched_results[0]["json"],
+                    "response": batched_results[0]["response"],
+                    "med_time": med_time_str
+                }
     else:
-        return batched_results[0]
+        return {
+                    "json": batched_results[0]["json"],
+                    "response": batched_results[0]["response"]
+                }
