@@ -64,20 +64,18 @@ async def process_notify_medicine() -> str:
     """
     사용자에게 약 복용 시간임을 알리는 응답을 생성합니다.
 
-    Args:
-        None
-
     Returns:
         str: AI 모델의 응답 텍스트
 
     Raises:
         ValueError: 처리 중 오류가 발생한 경우
     """
+    print_log("💡 [AI모델] 약 복용 알림 요청")
     try:
-        
-        # 약 복용 알림 프롬프트 사용
-        response = chat_with_llm("", custom_prompt=MEDICINE_NOTIFICATION_PROMPT)
-        print_log(f"🗣️ 모델 응답: {response}")
+        # 빈 대화 히스토리로 시작
+        datasets = []
+        response = chat_with_llm(datasets, custom_prompt=MEDICINE_NOTIFICATION_PROMPT)
+        print_log(f"✅ [AI모델] 약 복용 알림 응답: {response}")
         return response
     except Exception as e:
         print_log(f"❌ 약 복용 알림 처리 중 오류 발생: {str(e)}", "error")
