@@ -122,7 +122,7 @@ SYSTEM_PROMPT = [
      }
 ]
 
-def parse_llm_output(text):
+def parse_llm_output(text, is_confirmation=False):
     # 1. assistant 시작 위치 찾기
     #print("🧪 [디버깅] 들어온 text 타입:", type(text), flush=True)  # 얘가 먼저 찍힘
     #print("🧪 [디버깅] 들어온 text 길이:", len(text))
@@ -136,22 +136,34 @@ def parse_llm_output(text):
     # 2. 해당 지점부터 텍스트 잘라서 파싱
     relevant_text = text[start.end():].strip()
 
-    # 3. 태그별로 추출
-    json_match = re.search(r'<json>(.*?)</json>', relevant_text, re.DOTALL)
+    # 3. 태그별로 추출    
     response_match = re.search(r'<response>(.*?)</response>', relevant_text, re.DOTALL)
-
-    if json_match and response_match:
-        return {
-            "json": json_match.group(1).strip(),
-            "response": response_match.group(1).strip(),
-        }
-    else:
-        print_log("❌ 일부 태그가 누락되었거나 형식이 다름!", 'error')
-        if not json_match:
-            print_log("⛔ <json> 태그 못 찾음", 'error')
-        if not response_match:
-            print_log("⛔ <response> 태그 못 찾음", 'error')
-        return None
+    if is_confirmation:
+        json_match = re.search(r'<json>(.*?)</json>', relevant_text, re.DOTALL)
+        if json_match and response_match:
+            return {
+                "json": json_match.group(1).strip(),
+                "response": response_match.group(1).strip(),
+            }
+    
+        else:
+            print_log("❌ 일부 태그가 누락되었거나 형식이 다름!", 'error')
+            if not json_match:
+                print_log("⛔ <json> 태그 못 찾음", 'error')
+            if not response_match:
+                print_log("⛔ <response> 태그 못 찾음", 'error')
+            return None
+    else: 
+        if response_match:
+            return {
+                "response": response_match.group(1).strip(),
+            }
+    
+        else:
+            print_log("❌ 일부 태그가 누락되었거나 형식이 다름!", 'error')
+            if not response_match:
+                print_log("⛔ <response> 태그 못 찾음", 'error')
+            return None
         
 def parse_medication_info(json_dict):
     """
