@@ -3,7 +3,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import re
 from tqdm import tqdm
 import json
-
+from prompts import *
 from model_create import return_model_tokenizer
 from logger import print_log
 
@@ -287,22 +287,23 @@ def chat_with_llm(datasets, custom_prompt=None):
                 print_log(f'JSON: {result["json"]}')
                 print_log(f'응답: {result["response"]}')
 
-                json_data = safe_json_load(result["json"])
-                if json_data is None:
-                    print_log("JSON이 None이므로 파싱 실패!", 'error')
-                    continue
-                
-                if json_data is not None:
-                    day_offset, abs_time, rel_time = parse_medication_info(json_data)
-                    med_time_str = get_medication_time_str(
-                        med_day_offset=day_offset,
-                        absolute_time=abs_time,
-                        relative_time=rel_time
-                    )
-                    print_log(f'복약 시점 >>> {med_time_str}')
-                else:
-                    print_log("json이 None이어서 복약 시점 파싱 실패!", 'error')
-                    raise ValueError("복약 시점 파싱 실패!")
+                if custom_prompt != MEDICINE_NOTIFICATION_PROMPT:
+                    json_data = safe_json_load(result["json"])
+                    if json_data is None:
+                        print_log("JSON이 None이므로 파싱 실패!", 'error')
+                        continue
+                if custom_prompt == MEDICINE_CONFIRMATION_PROMPT:
+                    if json_data is not None:
+                        day_offset, abs_time, rel_time = parse_medication_info(json_data)
+                        med_time_str = get_medication_time_str(
+                            med_day_offset=day_offset,
+                            absolute_time=abs_time,
+                            relative_time=rel_time
+                        )
+                        print_log(f'복약 시점 >>> {med_time_str}')
+                    else:
+                        print_log("json이 None이어서 복약 시점 파싱 실패!", 'error')
+                        raise ValueError("복약 시점 파싱 실패!")
                 
                 batched_results.append(result)
             else:
