@@ -291,14 +291,18 @@ def chat_with_llm(datasets, custom_prompt=None):
                 if json_data is None:
                     print_log("JSON 파싱 실패!", 'error')
                     continue
-
-                day_offset, abs_time, rel_time = parse_medication_info(json_data)
-                med_time_str = get_medication_time_str(
-                    med_day_offset=day_offset,
-                    absolute_time=abs_time,
-                    relative_time=rel_time
-                )
-                print_log(f'복약 시점 >>> {med_time_str}')
+                
+                if json_data is not None:
+                    day_offset, abs_time, rel_time = parse_medication_info(json_data)
+                    med_time_str = get_medication_time_str(
+                        med_day_offset=day_offset,
+                        absolute_time=abs_time,
+                        relative_time=rel_time
+                    )
+                    print_log(f'복약 시점 >>> {med_time_str}')
+                else:
+                    print_log("json이 None이어서 복약 시점 파싱 실패!", 'error')
+                    raise ValueError("복약 시점 파싱 실패!")
                 
                 batched_results.append(result)
             else:
