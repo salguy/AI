@@ -34,8 +34,7 @@ async def check_meal_inference(data: AIInput):
             - response: AI의 응답 텍스트
     """
     try:
-        return await process_check_meal(data)
-    except Exception as e:
+        return await process_check_meal(data.input_text)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/api/inference/induce_medicine")
