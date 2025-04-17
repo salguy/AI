@@ -34,7 +34,7 @@ async def check_meal_inference(data: AIInput):
             - response: AI의 응답 텍스트
     """
     try:
-        return await process_check_meal(data)
+        return await process_check_meal(data.input_text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -51,7 +51,7 @@ async def induce_medicine_inference(data: AIInput):
             - response: AI의 응답 텍스트
     """
     try:
-        return await process_induce_medicine(data)
+        return await process_induce_medicine(data.input_text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -85,7 +85,7 @@ async def check_medicine_inference(data: AIInput):
             - response: AI의 응답 텍스트
     """
     try:
-        return await process_confirm_medicine(data)
+        return await process_confirm_medicine(data.input_text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -102,6 +102,6 @@ async def daily_talk_inference(data: AIInput):
             - response: AI의 응답 텍스트
     """
     try:
-        return await process_daily_talk(data)
+        return await process_daily_talk(data.input_text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
