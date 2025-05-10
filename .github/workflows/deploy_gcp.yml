@@ -18,4 +18,4 @@ jobs:
         script: |
           cd ~/AI
           git pull origin develop
-          pm2 restart salguy
+          /opt/conda/bin/pm2 restart salguy
