@@ -292,7 +292,7 @@ def chat_with_llm(datasets, custom_prompt=None):
                     print_log(f'JSON: {result["json"]}')
                     print_log(f'응답: {result["response"]}')
 
-                if custom_prompt != MEDICINE_NOTIFICATION_PROMPT:
+                if custom_prompt != MEDICINE_NOTIFICATION_PROMPT and custom_prompt != INTENT_INFERENCE_PROMPT:
                     json_data = safe_json_load(result["json"])
                     if json_data is None:
                         print_log("JSON이 None이므로 파싱 실패!", 'error')
