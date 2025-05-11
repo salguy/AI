@@ -2,8 +2,8 @@ import os
 import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-requirements_file = os.path.join(os.path.dirname(__file__), '..', 'env', 'requirements.txt')
-os.system(f'pip install --quiet -r {requirements_file}')
+# requirements_file = os.path.join(os.path.dirname(__file__), '..', 'env', 'requirements.txt')
+# os.system(f'pip install --quiet -r {requirements_file}')
 
 from colorama import init
 
