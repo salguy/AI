@@ -137,12 +137,17 @@ def parse_llm_output(text):
     # 3. 태그별로 추출
     json_match = re.search(r'<json>(.*?)</json>', relevant_text, re.DOTALL)
     response_match = re.search(r'<response>(.*?)</response>', relevant_text, re.DOTALL)
-
+    intent_match = re.search(r'<intent>(.*?)</intent>', relevant_text, re.DOTALL)
     if json_match and response_match:
         return {
             "json": json_match.group(1).strip(),
             "response": response_match.group(1).strip(),
         }
+    elif intent_match:
+        return {
+            "intent": intent_match.group(1).strip(),
+        }
+    
     else:
         print_log("❌ 일부 태그가 누락되었거나 형식이 다름!", 'error')
         if not json_match:
@@ -283,8 +288,9 @@ def chat_with_llm(datasets, custom_prompt=None):
             print_log(f'사용자의 응답: {data_input}')
             print_log(f'AI의 응답: {output_text}')
             if result:
-                print_log(f'JSON: {result["json"]}')
-                print_log(f'응답: {result["response"]}')
+                if custom_prompt != INTENT_INFERENCE_PROMPT:
+                    print_log(f'JSON: {result["json"]}')
+                    print_log(f'응답: {result["response"]}')
 
                 if custom_prompt != MEDICINE_NOTIFICATION_PROMPT:
                     json_data = safe_json_load(result["json"])
@@ -314,6 +320,10 @@ def chat_with_llm(datasets, custom_prompt=None):
                     "json": batched_results[0]["json"],
                     "response": batched_results[0]["response"],
                     "med_time": med_time_str
+                }
+    elif custom_prompt == INTENT_INFERENCE_PROMPT:
+        return {
+                    "intent": batched_results[0]["intent"]
                 }
     else:
         return {
